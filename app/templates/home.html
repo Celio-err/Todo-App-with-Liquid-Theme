@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List | Liquid Theme</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: radial-gradient(circle at 0% 0%, #dcfce7 0%, #f8fafc 50%, #dbeafe 100%);
+            --bg-dark: radial-gradient(circle at 0% 0%, #064e3b 0%, #020617 50%, #1e3a8a 100%);
+            --panel-light: rgba(255, 255, 255, 0.7);
+            --panel-dark: rgba(15, 23, 42, 0.8);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-light);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        body.dark-mode { background: var(--bg-dark); }
+
+        .liquid-blob {
+            position: absolute;
+            width: 550px;
+            height: 550px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            filter: blur(70px);
+            border-radius: 40% 60% 60% 40%;
+            animation: flow 12s infinite alternate ease-in-out;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        @keyframes flow {
+            from { transform: translate(-10%, -10%) rotate(0deg); }
+            to { transform: translate(15%, 15%) rotate(40deg); }
+        }
+
+        .ios-panel, .ios-card {
+            background: var(--panel-light);
+            backdrop-filter: blur(35px) saturate(180%);
+            -webkit-backdrop-filter: blur(35px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50px;
+            transition: all 0.5s ease;
+        }
+
+        .dark-mode .ios-panel, .dark-mode .ios-card {
+            background: var(--panel-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 24px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .dark-mode .input-group { background: rgba(0, 0, 0, 0.2); }
+
+        .input-group:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .dark-mode .input-group:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .btn-liquid {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transition: all 0.3s ease;
+        }
+        .btn-liquid:active { transform: scale(0.95); }
+
+        .theme-toggle {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            transition: 0.3s;
+        }
+        .dark-mode .theme-toggle { background: rgba(255, 255, 255, 0.1); color: #fbbf24; }
+
+        .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(155, 155, 155, 0.2);
+    border-radius: 10px;
+}
+    </style>
+</head>
+<body id="body">
+
+<script>
+    // Cek tema secara instan sebelum elemen lain dimuat
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+</script>
+
+    <div class="liquid-blob"></div>
+
+    <div class="w-full max-w-md p-4">
+        <div class="ios-panel p-8 shadow-2xl">
+            
+            <div class="flex justify-between items-center mb-8">
+                <div class="bg-black text-white px-5 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase">
+                    Focus Mode
+                </div>
+                <div onclick="toggleDarkMode()" class="theme-toggle">
+                    <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="text-left mb-8">
+                <h1 class="text-4xl font-bold text-slate-900 dark:text-white transition-colors">Todo List</h1>
+                <p class="text-slate-500 dark:text-slate-400 font-medium mt-1">Halo ita nia Loron sai Produtivu liu tan</p>
+            </div>
+
+            <div class="input-group mb-8 cursor-pointer" onclick="openTaskForm()">
+                <div class="p-3 text-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+                <span class="text-slate-400 dark:text-slate-500 font-semibold ml-2">Capture a task...</span>
+            </div>
+
+        <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+    {% for todo in todos %}
+        <div class="group flex items-center p-5 rounded-[28px] bg-white/40 dark:bg-white/5 border border-white/20 shadow-sm transition-all hover:scale-[1.02] {% if todo.is_completed %}opacity-60{% endif %}">
+            
+            <a href="{% url 'toggle_todo' todo.pk %}" class="w-6 h-6 rounded-lg border-2 flex-shrink-0 flex items-center justify-center transition-colors 
+                {% if todo.is_completed %}bg-blue-500 border-blue-500{% else %}border-blue-500 hover:bg-blue-500/10{% endif %}">
+                {% if todo.is_completed %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                {% endif %}
+            </a>
+
+           <div class="ml-4 flex-grow">
+    <span class="block font-bold text-slate-800 dark:text-slate-200 transition-all {% if todo.is_completed %}line-through text-slate-500{% endif %}">
+        {{ todo.titulu }}
+    </span>
+    
+    <div class="flex items-center space-x-2 mt-0.5">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-500/70">
+            {{ todo.kategoria }}
+        </span>
+        
+        {% if todo.is_completed and todo.completed_at %}
+        <span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 flex items-center">
+            <span class="mx-1">•</span>
+            Konkluidu iha: {{ todo.completed_at|date:"d M, H:i" }}
+        </span>
+        {% endif %}
+    </div>
+</div>
+
+            <div class="flex items-center space-x-3">
+                <div class="text-[10px] font-bold px-3 py-1 rounded-full 
+                    {% if todo.prioridade == 'High' %}
+                        bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400
+                    {% else %}
+                        bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400
+                    {% endif %}">
+                    {{ todo.prioridade }}
+                </div>
+
+                <a href="{% url 'delete_todo' todo.pk %}" 
+                   onclick="return confirm('Hamoss Task refere?')"
+                   class="text-slate-400 hover:text-red-500 transition-colors p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="text-center py-10">
+            <p class="text-slate-400 italic">Seidauk iha task. Kria Task!</p>
+        </div>
+    {% endfor %}
+</div>
+
+            <div class="mt-12 flex justify-center">
+                <div class="w-32 h-1.5 bg-slate-400/30 rounded-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskModal" class="fixed inset-0 z-50 invisible opacity-0 transition-all duration-500 flex items-end sm:items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-md" onclick="closeTaskForm()"></div>
+        
+        <div id="modalPanel" class="ios-card w-full max-w-lg p-8 transform translate-y-full transition-transform duration-500 ease-out relative shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold dark:text-white">Anexa Task</h2>
+                <button onclick="closeTaskForm()" class="text-slate-400 hover:text-red-500 font-bold transition-colors">Kansela</button>
+            </div>
+            
+        <form method="POST" action="" class="space-y-5">
+    {% csrf_token %}
+    
+    <div>
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Task Naran</label>
+        <input type="text" name="titulu" required placeholder="Oinsa planu?" 
+            class="w-full bg-slate-100 dark:bg-white/10 rounded-2xl p-4 outline-none dark:text-white font-semibold mt-1 border border-transparent focus:border-blue-500/50 transition-all">
+    </div>
+
+    <div>
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Deskrisaun</label>
+        <textarea name="deskrisaun" rows="3" placeholder="Hakerek detalhu ruma iha ne'e..." 
+            class="w-full bg-slate-100 dark:bg-white/10 rounded-2xl p-4 outline-none dark:text-white font-medium mt-1 border border-transparent focus:border-blue-500/50 transition-all resize-none"></textarea>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Kategoria</label>
+            <select name="kategoria" class="w-full bg-slate-100 dark:bg-white/10 p-4 rounded-2xl dark:text-white outline-none mt-1 cursor-pointer">
+                <option value="Work">Servisu</option>
+                <option value="Personal">Personal</option>
+            </select>
+        </div>
+        <div>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Prioridade</label>
+            <select name="prioridade" class="w-full bg-slate-100 dark:bg-white/10 p-4 rounded-2xl dark:text-white outline-none mt-1 cursor-pointer">
+                <option value="High">A'as</option>
+                <option value="Normal" selected>Normal</option>
+            </select>
+        </div>
+    </div>
+
+    <button type="submit" class="btn-liquid w-full py-5 rounded-[28px] text-white font-bold mt-4 shadow-xl active:scale-95 transition-transform">
+        Kria Task
+    </button>
+</form>
+        </div>
+    </div>
+
+    <script>
+    // 1. Fungsi untuk membuka modal
+    function openTaskForm() {
+        const modal = document.getElementById('taskModal');
+        const panel = document.getElementById('modalPanel');
+        modal.classList.remove('invisible', 'opacity-0');
+        modal.classList.add('opacity-100');
+        panel.classList.remove('translate-y-full');
+        panel.classList.add('translate-y-0');
+    }
+
+    // 2. Fungsi untuk menutup modal
+    function closeTaskForm() {
+        const modal = document.getElementById('taskModal');
+        const panel = document.getElementById('modalPanel');
+        panel.classList.add('translate-y-full');
+        panel.classList.remove('translate-y-0');
+        setTimeout(() => {
+            modal.classList.add('invisible', 'opacity-0');
+            modal.classList.remove('opacity-100');
+        }, 400);
+    }
+
+    // 3. Fungsi pembantu untuk mengubah ikon (diletakkan di luar agar bisa diakses global)
+    function updateIcon(isDark) {
+        const icon = document.getElementById('theme-icon');
+        if (isDark) {
+            // Ikon Matahari
+            icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
+        } else {
+            // Ikon Bulan
+            icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />';
+        }
+    }
+
+    // 4. Fungsi Toggle Dark Mode
+    function toggleDarkMode() {
+        const body = document.getElementById('body');
+        body.classList.toggle('dark-mode');
+
+        const isDark = body.classList.contains('dark-mode');
+        
+        // Simpan ke localStorage
+        if (isDark) {
+            localStorage.setItem('theme', 'dark');
+        } else {
+            localStorage.setItem('theme', 'light');
+        }
+        
+        updateIcon(isDark);
+    }
+
+    // 5. Cek tema saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        const body = document.getElementById('body');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            body.classList.add('dark-mode');
+            updateIcon(true);
+        }
+    });
+</script>
+</body>
+</html>
